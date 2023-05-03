@@ -1,3 +1,5 @@
+from wichi.utils.logging import Logger
+from wichi.data.mnist import MNISTDataset as MNIST
 from wichi.core.value import Value
 from wichi.modules.module import Module
 from wichi.modules.neuron import Neuron
