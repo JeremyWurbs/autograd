@@ -2,8 +2,8 @@ from wichi import Neuron, Module
 
 
 class Layer(Module):
-    def __init__(self, num_input, num_output):
-        self.neurons = [Neuron(num_input) for _ in range(num_output)]
+    def __init__(self, num_input, num_output, **kwargs):
+        self.neurons = [Neuron(num_input, **kwargs) for _ in range(num_output)]
 
     def __call__(self, x):
         outs = [n(x) for n in self.neurons]
