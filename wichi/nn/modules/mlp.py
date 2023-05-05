@@ -1,4 +1,4 @@
-from wichi import Layer, Module
+from wichi.nn import Module, Layer
 
 
 class MLP(Module):

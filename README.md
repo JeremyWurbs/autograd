@@ -1,16 +1,12 @@
 # Wichi
 
-We follow Andrej Karpathy's [Micrograd](https://github.com/karpathy/micrograd) 
-package (following PyTorch conventions) to create Wichi— a simple
-reference implementation of an autograd engine.
+Wichi is a continuation of Andrej Karpathy's 
+[Micrograd](https://github.com/karpathy/micrograd) package (following PyTorch 
+conventions)— i.e. a simple reference implementation for an autograd engine.
 
 # Installation
 
-If you wish to draw network graphs, first install graphviz.
-
-# Installation
-
-In order to create png images of the resulting network graphs, install graphviz
+If you wish to create svg images of the resulting network graphs, install graphviz
 (used by `wichi.utils.graphing`):
 
 ```commandline
@@ -40,9 +36,10 @@ pip install dist/autograd-1.0.0-py3-none-any.whl
 # Basic Usage
 
 Wichi is built around the Value class, which maintains a piece of `data` as well as 
-a `grad` (gradient) to be computed locally on any backward pass. All common operations
+a `grad` (gradient) to be computed locally during a backward pass. All common operations
 (summation, multiplication, exponentiation, etc.) are supported, with a few additional
-advanced ops as well (ReLU, Tanh), which may be used to create standard perceptions.
+advanced ops as well (ReLU, Tanh), which may be used to create standard neural 
+network perceptrons.
 
 You may create a network, run a forward and backward pass, and plot the resulting 
 network graph with the following:

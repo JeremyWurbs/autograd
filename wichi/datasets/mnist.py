@@ -22,7 +22,7 @@ class MNISTDataset(torch.utils.data.Dataset):
         self._val_idx = 0
         self._test_idx = 0
 
-        # download data
+        # download datasets
         MNIST(os.getcwd(), train=True, download=True)
         MNIST(os.getcwd(), train=False, download=False)
 
@@ -38,10 +38,10 @@ class MNISTDataset(torch.utils.data.Dataset):
 
     def parse_data(self, dataset, total, name):
         parsed_data = dict()
-        parsed_data['data'] = torch.empty((total, self.H*self.W), dtype=torch.double)
+        parsed_data['datasets'] = torch.empty((total, self.H*self.W), dtype=torch.double)
         parsed_data['labels'] = torch.empty((total, 1), dtype=torch.long)
-        for i, (x, y) in tqdm(enumerate(dataset), total=total, desc=f'Parsing {name} data'):
-            parsed_data['data'][i, :] = x.view(1, self.H*self.W)
+        for i, (x, y) in tqdm(enumerate(dataset), total=total, desc=f'Parsing {name} datasets'):
+            parsed_data['datasets'][i, :] = x.view(1, self.H*self.W)
             parsed_data['labels'][i] = torch.tensor(y).view(1)
         return parsed_data
 
@@ -79,7 +79,7 @@ class MNISTDataset(torch.utils.data.Dataset):
 
     @property
     def train_data(self):
-        return self.train['data']
+        return self.train['datasets']
 
     @property
     def train_labels(self):
@@ -87,7 +87,7 @@ class MNISTDataset(torch.utils.data.Dataset):
 
     @property
     def val_data(self):
-        return self.val['data']
+        return self.val['datasets']
 
     @property
     def val_labels(self):
@@ -95,7 +95,7 @@ class MNISTDataset(torch.utils.data.Dataset):
 
     @property
     def test_data(self):
-        return self.test['data']
+        return self.test['datasets']
 
     @property
     def test_labels(self):

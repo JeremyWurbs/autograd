@@ -1,4 +1,5 @@
-from wichi import Neuron, Layer, MLP, draw_dot
+from wichi.nn import Neuron, Layer, MLP
+from wichi.utils import draw_dot
 
 
 neuron = Neuron(num_input=2)

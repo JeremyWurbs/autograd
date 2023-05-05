@@ -1,7 +1,9 @@
 import torch
 import pytest
 
-from wichi import MNIST, MLP, Logger, Metrics
+from wichi.datasets import MNIST
+from wichi.nn import MLP
+from wichi.utils import Logger, Metrics
 import wichi.utils.conversions as converter
 
 

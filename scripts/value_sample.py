@@ -1,4 +1,5 @@
-from wichi import Value, draw_dot
+from wichi import Value
+from wichi.utils import draw_dot
 
 
 class Neuron(object):

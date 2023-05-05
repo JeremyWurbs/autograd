@@ -1,5 +1,6 @@
 import random
-from wichi import Value, Module
+from wichi import Value
+from wichi.nn import Module
 
 
 class Neuron(Module):
