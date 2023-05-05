@@ -1,4 +1,5 @@
 from wichi.utils.logging import Logger
+from wichi.utils.metrics import Metrics
 from wichi.data.mnist import MNISTDataset as MNIST
 from wichi.core.value import Value
 from wichi.modules.module import Module
