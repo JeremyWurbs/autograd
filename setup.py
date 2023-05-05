@@ -11,7 +11,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
      name='wichi',
-     version='0.0.1',
+     version='1.0.0',
      description="Package serving as an educational implementation of autograd",
      long_description=long_description,
      long_description_content_type="text/markdown",
