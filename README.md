@@ -245,13 +245,13 @@ pytest -s ./tests
 
 which should output something similar to the following,
 
-``` 
-======================================= test session starts =========================================
+```commandline
+============================================= test session starts =============================================
 platform linux -- Python 3.8.0, pytest-7.3.1, pluggy-1.0.0
 rootdir: /home/jeremy/projects/autograd
-collected 2 items                                                                                          
+collected 4 items                                                                                                       
 
-tests/test_value.py ..                                                                         [100%]
-======================================== 2 passed in 1.37s ==========================================
+tests/test_tensor.py ..                                                                                 [ 50%]
+tests/test_value.py ..                                                                                  [100%]
+============================================== 4 passed in 0.99s ==============================================
 ```
-
