@@ -78,7 +78,7 @@ Looking at the graph, we see that our code has generated ten different tensors:
 6. `-1` (this Tensor is created from the fact that the minus operator is implemented by a "multiply by -1")
 7. `-Y`
 8. `losses`
-9. `losses**2`
+9. `losses_sqr`
 10. `L`
 
 And used six different ops:
@@ -93,16 +93,16 @@ In order to train the network to better classify `X`, we need to compute $\frac{
 which we can get through the chain rule:
 
 ```math
-\frac{\partial L}{\partial W}  = \frac{\partial L}{\partial losses**2} \cdot \frac{\partial losses**2}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}
+\frac{\partial L}{\partial W}  = \frac{\partial L}{\partial losses_sqr} \cdot \frac{\partial losses_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}
 ```
 
 The strategy for computing this gradient is as follows:
 1. Set `L.grad` to `1`
-2. Run `L.grad_fn` to compute $\frac{\partial L}{\partial losses**2}$ and store the result in `losses**2.grad`
-3. Run `losses**2.grad_fn` to compute $\frac{\partial losses\*\*2}{\partial losses}$ and store $\frac{\partial L}{\partial losses\*\*2} \cdot \frac{\partial losses**2}{\partial losses}$ into `losses.grad`
-4. Run `losses.grad_fn` to compute $\frac{\partial losses}{\partial Z}$ and store $\frac{\partial L}{\partial losses* *2} \cdot \frac{\partial losses**2}{\partial losses} \cdot \frac{\partial losses}{\partial Z}$ into `Z.grad`
-5. Run `Z.grad_fn` to compute $\frac{\partial Z}{\partial Y}$ and store $\frac{\partial L}{\partial losses**2} \cdot \frac{\partial losses**2}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y}$ into `dot_product.grad`
-6. Run `dot_product.grad_fn` to compute $\frac{\partial Y}{\partial W}$ and store $\frac{\partial L}{\partial losses**2} \cdot \frac{\partial losses**2}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}$ into `W.grad`
+2. Run `L.grad_fn` to compute $\frac{\partial L}{\partial losses_sqr}$ and store the result in `losses_sqr.grad`
+3. Run `losses_sqr.grad_fn` to compute $\frac{\partial losses_sqr}{\partial losses}$ and store $\frac{\partial L}{\partial losses_sqr} \cdot \frac{\partial losses_sqr}{\partial losses}$ into `losses.grad`
+4. Run `losses.grad_fn` to compute $\frac{\partial losses}{\partial Z}$ and store $\frac{\partial L}{\partial losses* *2} \cdot \frac{\partial losses_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z}$ into `Z.grad`
+5. Run `Z.grad_fn` to compute $\frac{\partial Z}{\partial Y}$ and store $\frac{\partial L}{\partial losses_sqr} \cdot \frac{\partial losses_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y}$ into `dot_product.grad`
+6. Run `dot_product.grad_fn` to compute $\frac{\partial Y}{\partial W}$ and store $\frac{\partial L}{\partial losses_sqr} \cdot \frac{\partial losses_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}$ into `W.grad`
 7. Set `W.data -= lr * W.grad`, for some learning rate `lr`.
 
 For example, the `grad_fn` for `Y` (which computed `X @ W`) is generated as part 
