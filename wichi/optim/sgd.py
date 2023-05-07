@@ -19,8 +19,6 @@ class SGD(object):
                     self.velocity[p] = p.grad
                 else:
                     self.velocity[p] = self.momentum * self.velocity[p] + (1-self.dampening) * p.grad
-                    #self.velocity[p] *= self.momentum
-                    #self.velocity[p] += (1-self.dampening) * p.grad
                 p.data -= self.lr * self.velocity[p]
             else:
                 p.data -= self.lr * p.grad
