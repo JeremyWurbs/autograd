@@ -113,24 +113,24 @@ The strategy for computing this gradient is as follows:
 6. Run `dot_product.grad_fn` to compute $\frac{\partial Y}{\partial W}$ and store $\frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}$ into `W.grad`
 7. Set `W.data -= lr * W.grad`, for some learning rate `lr`.
 
-For example, the `grad_fn` for `Y` (which computed `X @ W`) is generated as part 
-of the `@` op (i.e. `X.__matmul__(W)`), and would look like:
+For example, the `grad_fn` for the `dot_product` Tensor is generated as part 
+of the `@` op (i.e. `X.__matmul__(W)`), and would be functionally identical to the following:
 ```python 
 def __matmul__(X, W):
-    Y = Tensor(X.data * W.data)
+    dot_product = Tensor(X.data * W.data)
 
     def _grad_fn():
-        X.grad += Y.grad @ W.data.T
-        Y.grad += X.data.T @ Y.grad
-    Y._grad_fn = _grad_fn
+        X.grad += dot_product.grad @ W.data.T
+        W.grad += X.data.T @ dot_product.grad
+    dot_product._grad_fn = _grad_fn
 
-    return Y
+    return dot_product
 ```
 
 Note that this grad function actually has to compute 
-$\frac{\partial Y}{\partial W}$ **and** $\frac{\partial Y}{\partial X}$, since
+$\frac{\partial dot_product}{\partial W}$ **and** $\frac{\partial dot_product}{\partial X}$, since
 `__matmul__` is a binary operator and thus, in general, the gradients need to 
-flow to both input Tensors.
+flow to both input Tensors (even though in this case we do not need the `X.grad`).
 
 # Usage Basics
 
@@ -141,36 +141,53 @@ network graph with the following:
 from wichi import Tensor
 from wichi.utils import draw_dot
 
-x1 = Tensor(2.0, label='x1')
-x2 = Tensor(-1.0, label='x2')
+x1 = Tensor(2., label='x1')
+x2 = Tensor(-1., label='x2')
 w1 = Tensor(0.5, label='w1')
 w2 = Tensor(0.75, label='w2')
-y = Tensor(0, label='y')
+y = Tensor(0., label='y')
 
-y_hat = w1*x1 + w2*x2; y_hat.label = 'y_hat'
+y_hat = w1*x1 + w2*x2; y_hat.label='y_hat'
 loss = (y - y_hat) ** 2; loss.label = 'loss'
 
-loss.backward()  # computes gradients
 draw_dot(loss).render()
 ```
 
 Which will yield the following diagram:
 
-![Rendered DiGraph](./resources/Digraph.gv.svg)
+![Forward Pass](./resources/Forward%20Pass%20Example.svg)
+
+Notice that all of the gradients are still zero. In order to compute the gradients
+we have to call `backward()` on a Tensor in the graph. I.e.:
+
+```python
+loss.backward()  # computes gradients
+draw_dot(loss).render()
+```
+
+![Rendered DiGraph](./resources/Backward%20Pass%20Example.svg)
+
+Now the gradients have been filled in, and any parameter updates may happen as
+discussed above.
+
+## wichi.modules
 
 In addition, there is also the Modules module, which provides Neuron, Layer and
 MLP classes to help create simple neural networks.
 
 ```python
-from wichi import MLP, draw_dot
+import numpy as np
+from wichi import Tensor
+from wichi.nn import MLP
+from wichi.utils import draw_dot
 
-mlp = MLP(dim=[3, 4, 2])
+mlp = MLP(dim=[784, 80, 20, 10])
 
-x = [2.5, 0.5, -1.0]
-y = [-1.0, 1.0]
+x = Tensor(np.random.randn(32, 784), label='x')
+y = Tensor(np.random.randn(32, 10), label='y')
 
-y_hat = MLP(x)
-loss = sum([(y - y_hat)**2 for y, y_hat in zip(y, y_hat)]) / 2
+y_hat = mlp(x)
+loss = ((y - y_hat) ** 2).sum()
 
 loss.backward()  # computes gradients
 draw_dot(loss).render()
@@ -178,9 +195,7 @@ draw_dot(loss).render()
 
 which will yield the following diagram:
 
-![Rendered MLP DiGraph](./resources/MLP_Digraph.gv.svg)
-
-As can be seen, the graphs can get quite large rather quickly. 
+![Rendered MLP DiGraph](./resources/MLP%20Graph%20Example.svg)
 
 # Training
 
@@ -206,7 +221,7 @@ for epoch in max_epochs:
         y_hat = mlp(x)
         loss = loss_fn(y, y_hat)
         
-        loss.zero_grad()
+        mlp.zero_grad()
         loss.backward()
         
         for p in mlp.parameters():
@@ -217,8 +232,8 @@ for epoch in max_epochs:
 
 For an explicit training sample, refer to the 
 [mnist_training.py](./scripts/mnist_training_deprecated.py)
-sample, which initializes a Wichi network with the same weights as a torch model,
-and then trains both side by side, showing that the Wichi autograd exactly
+sample, which initializes a Wichi network with the same weights as a Torch model,
+and then trains both side by side, asserting that the Wichi autograd exactly
 matches PyTorch's autograd.
 
 # Testing
