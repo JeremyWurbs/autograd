@@ -101,7 +101,7 @@ functions between them in the forward pass graph, we will need to use the chain
 rule to compute $\frac{\partial L}{\partial W}$. That is, by the chain rule: 
 
 ```math
-\frac{\partial L}{\partial W}  = \frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}
+\frac{\partial L}{\partial W}  = \frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial dot\_product} \cdot \frac{\partial dot\_product}{\partial W}
 ```
 
 The strategy for computing this gradient is as follows:
@@ -109,8 +109,8 @@ The strategy for computing this gradient is as follows:
 2. Run `L.grad_fn` to compute $\frac{\partial L}{\partial losses\_sqr}$ and store the result in `losses_sqr.grad`
 3. Run `losses_sqr.grad_fn` to compute $\frac{\partial losses\\_sqr}{\partial losses}$ and store $\frac{\partial L}{\partial losses\\_sqr} \cdot \frac{\partial losses\\_sqr}{\partial losses}$ into `losses.grad`
 4. Run `losses.grad_fn` to compute $\frac{\partial losses}{\partial Z}$ and store $\frac{\partial L}{\partial losses* *2} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z}$ into `Z.grad`
-5. Run `Z.grad_fn` to compute $\frac{\partial Z}{\partial Y}$ and store $\frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y}$ into `dot_product.grad`
-6. Run `dot_product.grad_fn` to compute $\frac{\partial Y}{\partial W}$ and store $\frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}$ into `W.grad`
+5. Run `Z.grad_fn` to compute $\frac{\partial Z}{\partial dot\_product}$ and store $\frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial dot\_product}$ into `dot_product.grad`
+6. Run `dot_product.grad_fn` to compute $\frac{\partial dot\_product}{\partial W}$ and store $\frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial dot\_product} \cdot \frac{\partial dot\_product}{\partial W}$ into `W.grad`
 7. Set `W.data -= lr * W.grad`, for some learning rate `lr`.
 
 For example, the `grad_fn` for the `dot_product` Tensor is generated as part 
