@@ -9,7 +9,7 @@ from tqdm import tqdm
 
 
 class MNISTDataset(torch.utils.data.Dataset):
-    def __init__(self, batch_size=32, num_train=55000, H=28, W=28):
+    def __init__(self, batch_size=32, num_train=55000, H=28, W=28, dtype=torch.float32):
         assert num_train <= 60000, 'There are only 60000 total training samples available'
         super().__init__()
         self.batch_size = batch_size
@@ -17,6 +17,7 @@ class MNISTDataset(torch.utils.data.Dataset):
         self.num_val = 60000 - num_train
         self.H = H
         self.W = W
+        self.dtype = dtype
 
         self._train_idx = 0
         self._val_idx = 0
@@ -32,14 +33,14 @@ class MNISTDataset(torch.utils.data.Dataset):
         train, val = random_split(MNIST(os.getcwd(), train=True, transform=transform), [self.num_train, self.num_val])
         test = MNIST(os.getcwd(), train=False, transform=transform)
 
-        self.train = self.parse_data(train, self.num_train, 'training')
-        self.val = self.parse_data(val, self.num_val, 'validation')
-        self.test = self.parse_data(test, 10000, 'test')
+        self.train = self.parse_data(train, self.num_train, 'training', dtype=dtype)
+        self.val = self.parse_data(val, self.num_val, 'validation', dtype=dtype)
+        self.test = self.parse_data(test, 10000, 'test', dtype=dtype)
 
-    def parse_data(self, dataset, total, name):
+    def parse_data(self, dataset, total, name, dtype=torch.float32):
         parsed_data = dict()
-        parsed_data['datasets'] = torch.empty((total, self.H*self.W), dtype=torch.double)
-        parsed_data['labels'] = torch.empty((total, 1), dtype=torch.long)
+        parsed_data['datasets'] = torch.empty((total, self.H*self.W), dtype=dtype)
+        parsed_data['labels'] = torch.empty((total, 1), dtype=torch.int32)
         for i, (x, y) in tqdm(enumerate(dataset), total=total, desc=f'Parsing {name} datasets'):
             parsed_data['datasets'][i, :] = x.view(1, self.H*self.W)
             parsed_data['labels'][i] = torch.tensor(y).view(1)
@@ -61,7 +62,7 @@ class MNISTDataset(torch.utils.data.Dataset):
             idx += batch_size
 
         if one_hot:
-            batch_labels = F.one_hot(batch_labels, num_classes=10).squeeze(dim=1).double()
+            batch_labels = F.one_hot(batch_labels.long(), num_classes=10).squeeze(dim=1).type(self.dtype)
 
         return batch_data, batch_labels, idx
 
