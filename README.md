@@ -69,8 +69,8 @@ import numpy as np
 from wichi import Tensor
 
 X = Tensor(np.random.randn(32, 784))  # input data
-Y = Tensor(np.random.randn(32, 1))    # train labels
-W = Tensor(np.random.randn(784, 1))   # weights to train
+Y = Tensor(np.random.randn(32, 10))    # train labels
+W = Tensor(np.random.randn(784, 10))   # weights to train
 
 dot_product = X @ W     # i.e. dot_product = X.__matmul__(W)
 Z = dot_product.relu()  # perceptron output
@@ -82,7 +82,7 @@ which yields the following graph:
 
 Looking at the graph, we see that our code has generated ten different tensors:
 1. `X` (i.e. batch of 32 mnist images)
-2. `Y` (i.e. batch of 32 mnist labels)
+2. `Y` (i.e. batch of 32 mnist one-hot labels)
 3. `W` (i.e. the weights we'd like to train)
 4. `dot_product`
 5. `Z`  (i.e. a standard perceptron)
