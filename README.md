@@ -89,8 +89,11 @@ And used six different ops:
 5. `**2` (`.__pow__()`)
 6. `.sum(dim=all)` (`.sum()`)
 
-In order to train the network to better classify `X`, we need to compute $\frac{\partial L}{\partial W}$, 
-which we can get through the chain rule:
+The general strategy for training a network is to update its parameters 
+(weights) to decrease the loss. That is, $W += -lr * \frac{\partial L}{\partial W}$
+for some learning rate constant `lr`. As generally `L` and `W` will have many
+functions between them in the forward pass graph, we will need to use the chain 
+rule to compute $\frac{\partial L}{\partial W}$. That is, by the chain rule: 
 
 ```math
 \frac{\partial L}{\partial W}  = \frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}
