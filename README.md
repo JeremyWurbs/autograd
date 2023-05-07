@@ -106,11 +106,11 @@ rule to compute $\frac{\partial L}{\partial W}$. That is, by the chain rule:
 
 The strategy for computing this gradient is as follows:
 1. Set `L.grad` to `1`
-2. Run `L.grad_fn` to compute $\frac{\partial L}{\partial losses\_sqr}$ and store the result in `losses_sqr.grad`
+2. Run `L.grad_fn` to compute $\frac{\partial L}{\partial losses\\_sqr}$ and store the result in `losses_sqr.grad`
 3. Run `losses_sqr.grad_fn` to compute $\frac{\partial losses\\_sqr}{\partial losses}$ and store $\frac{\partial L}{\partial losses\\_sqr} \cdot \frac{\partial losses\\_sqr}{\partial losses}$ into `losses.grad`
 4. Run `losses.grad_fn` to compute $\frac{\partial losses}{\partial Z}$ and store $\frac{\partial L}{\partial losses\\_sqr} \cdot \frac{\partial losses\\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z}$ into `Z.grad`
 5. Run `Z.grad_fn` to compute $\frac{\partial Z}{\partial dot\\_product}$ and store $\frac{\partial L}{\partial losses\\_sqr} \cdot \frac{\partial losses\\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial dot\\_product}$ into `dot_product.grad`
-6. Run `dot_product.grad_fn` to compute $\frac{\partial dot\\_product}{\partial W}$ and store $\frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial dot\\_product} \cdot \frac{\partial dot\\_product}{\partial W}$ into `W.grad`
+6. Run `dot_product.grad_fn` to compute $\frac{\partial dot\\_product}{\partial W}$ and store $\frac{\partial L}{\partial losses\\_sqr} \cdot \frac{\partial losses\\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial dot\\_product} \cdot \frac{\partial dot\\_product}{\partial W}$ into `W.grad`
 7. Set `W.data -= lr * W.grad`, for some learning rate `lr`.
 
 For example, the `grad_fn` for the `dot_product` Tensor is generated as part 
