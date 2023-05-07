@@ -69,8 +69,8 @@ import numpy as np
 from wichi import Tensor
 
 X = Tensor(np.random.randn(32, 784))  # input data
-Y = Tensor(np.random.randn(32, 10))    # train labels
-W = Tensor(np.random.randn(784, 10))   # weights to train
+Y = Tensor(np.random.randn(32, 10))   # train labels
+W = Tensor(np.random.randn(784, 10))  # weights to train
 
 dot_product = X @ W     # i.e. dot_product = X.__matmul__(W)
 Z = dot_product.relu()  # perceptron output
