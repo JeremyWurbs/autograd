@@ -93,8 +93,9 @@ The general strategy for training a network is to update its parameters
 (weights) in such a way that the loss will decrease. As our networks are
 composed solely of differentiable functions, we can compute how changing 
 our parameters will change the loss (i.e. $\frac{\partial L}{\partial W}$)
-and use this gradient value to update our parameters. That is, we want 
-$W += -lr * \frac{\partial L}{\partial W}$
+and use this gradient value to update our parameters. That is, we can 
+update our parameters according to 
+$W_{new} = W_{old} -lr * \frac{\partial L}{\partial W}$
 for some learning rate constant `lr`. As generally `L` and `W` will have many
 functions between them in the forward pass graph, we will need to use the chain 
 rule to compute $\frac{\partial L}{\partial W}$. That is, by the chain rule: 
