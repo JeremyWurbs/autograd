@@ -102,7 +102,7 @@ class Tensor(object):
         return self.transpose()
 
     def reshape(self, shape):
-        out = Tensor(self.data.reshape(shape), label=f'{self.label}.reshape()')
+        out = Tensor(self.data.reshape(shape), _children=(self, ), _op='RS', label=f'{self.label}.reshape()')
 
         def _grad_fn():
             self.grad = out.grad.reshape(self.grad.shape)
@@ -116,6 +116,8 @@ class Tensor(object):
         def _grad_fn():
             self.grad += out.data * out.grad
         out._grad_fn = _grad_fn
+
+        return out
 
     def tanh(self):
         x = self.data
@@ -153,7 +155,7 @@ class Tensor(object):
     def zero_grad(self):
         self.grad = np.zeros(self.data.shape, dtype='float32')
 
-    def backward(self):
+    def backward(self, gradient=None):
         topo = list()
         visited = set()
 
@@ -165,7 +167,10 @@ class Tensor(object):
                 topo.append(v)
         build_topo(self)
 
-        self.grad = np.ones(self.data.shape)
+        if gradient is None:
+            self.grad = np.ones(self.data.shape)
+        else:
+            self.grad = gradient
         for node in reversed(topo):
             node._grad_fn()
 
