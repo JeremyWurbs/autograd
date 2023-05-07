@@ -47,9 +47,9 @@ analogous `.grad` element, which represents the gradient of some downstream
 Tensor with respect to the current wrapped Tensor. For all data ops that the 
 Tensor class supports (e.g. summation, multiplication), each op is responsible 
 for creating a `_grad_fn()` method, which can subsequently be called to compute 
-the local partial derivative (i.e. the derivative of the current op) and passing 
-along the combined chained gradient to its parent Tensors (i.e. those Tensors
-which created it). 
+the local partial derivative (i.e. the derivative of the current op) and for 
+passing along the combined chained gradient to its parent Tensors (i.e. those 
+Tensors which created it). 
 
 At the end of this process, each parameter in the graph will have a gradient
 (i.e. a value describing how changing it will change some further downstream
