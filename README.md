@@ -41,17 +41,28 @@ look at PyTorch's
 which goes through the basics of creating and using Tensors able to unwind their
 ops for gradient computations on a backwards pass.
 
-Wichi is directly analogous to PyTorch. I.e. Wichi is built 
-around the `Tensor` class. Tensors wrap a `.data` element, capturing any ops 
-(e.g. summation, multiplication) on that
-data to create a `_grad_fn()` method (again directly analogous to PyTorch's) 
-for each op, which can subsequently be called in reverse order to compute 
-gradients through the entire graph when any Tensor's `backward()` method is 
-called.
+For the most part, Wichi is directly analogous to PyTorch. That is, Wichi is 
+built around the `Tensor` class. Tensors wrap a `.data` element and maintain an
+analogous `.grad` element, which represents the gradient of some downstream 
+Tensor with respect to the current wrapped Tensor. For all data ops that the 
+Tensor class supports (e.g. summation, multiplication), each op is responsible 
+for creating a `_grad_fn()` method, which can subsequently be called to compute 
+the local partial derivative (i.e. the derivative of the current op) and passing 
+along the combined chained gradient to its parent Tensors (i.e. those Tensors
+which created it). 
 
-For example, consider the following network, intuitively training a weight matrix, 
-`W`, to better classify a batch of 32 MNIST images (each 28*28=784 pixels) 
-according to a squared error loss (i.e. imagine `X` and `labels` have actual data):
+At the end of this process, each parameter in the graph will have a gradient
+(i.e. a value describing how changing it will change some further downstream
+Tensor's value). Assuming we want the downstream value to go down (i.e. as
+we would when minimizing a loss), it is clear we only need to subtract this 
+`.grad` from the `.data` (usually modulo a learning rate) and voila— through 
+the magic of backpropagation and autograd, your network will improve.
+
+# Autograd by Example
+
+Consider the following network, intuitively training a weight matrix, `W`, to 
+better classify a batch of 32 MNIST images (each 28*28=784 pixels) according to 
+a squared error loss (i.e. imagine `X` and `labels` have actual data):
 
 ```python 
 import numpy as np
@@ -98,7 +109,8 @@ update our parameters according to
 $W_{new} = W_{old} -lr * \frac{\partial L}{\partial W}$
 for some learning rate constant `lr`. As generally `L` and `W` will have many
 functions between them in the forward pass graph, we will need to use the chain 
-rule to compute $\frac{\partial L}{\partial W}$. That is, by the chain rule: 
+rule to compute $\frac{\partial L}{\partial W}$. That is, by the chain rule, 
+$\frac{\partial L}{\partial W}$ for our network above will be: 
 
 ```math
 \frac{\partial L}{\partial W}  = \frac{\partial L}{\partial losses\_sqr} \cdot \frac{\partial losses\_sqr}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial dot\_product} \cdot \frac{\partial dot\_product}{\partial W}
@@ -143,9 +155,42 @@ def __matmul__(X, W):
     ...
 ```
 
-Notice the `_children=(X, W)` argument where we pass in the two input Tensors. 
-In the future, when a tensor's `backward()` method is called, we will use
-the knowledge of which 
+Notice the `_children=(X, W)` argument where we pass in the two input Tensors, 
+and that when the current Tensor's `_grad_fn()` is called, the children's 
+`_grad_fn()` may be called next. Thus, in the future, when a tensor's 
+`backward()` method is called we may dynamically construct the reverse graph
+by recursively calling all the children of Tensor's and setting their `_grad_fn()`
+methods to run directly after the current Tensor's method. 
+
+More, the backward traversal path is not computed until a Tensor's `backward()` 
+method is called, allowing the forward graph to change dynamically from input 
+to input (or batch to batch), and for any number of losses or backwards gradients
+to be computed and composited onto each other trivially at run-time, anywhere in 
+the entire computation graph— a rather powerful computational tool.
+
+Explicitly, the backwards graph is computed at the start of the `backwards()` 
+method:
+```python
+def backward(self):
+    topo = list()
+    visited = set()
+
+    def build_topo(v):
+        if v not in visited:
+            visited.add(v)
+            for child in v._prev:
+                build_topo(child)
+            topo.append(v)
+    build_topo(self)
+```
+
+Which builds a sequential traversal through the graph in `topo`, which is subsequently
+traversed with:
+
+```python 
+    for node in reversed(topo):
+        node._grad_fn()
+```
 
 # Usage Basics
 
