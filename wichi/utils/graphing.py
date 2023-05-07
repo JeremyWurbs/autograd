@@ -24,7 +24,7 @@ def draw_dot(root):
         uid = str(id(n))
         # for any value in the graph, create a rectangular ('record') node for it
         if isinstance(n.data, np.ndarray):
-            dot.node(name=uid, label=f"{{ {n.label}{' | ' if len(n.label)>0 else ''} data dim: {n.data.shape} | grad dim: {n.grad.shape} }}", shape='record')
+            dot.node(name=uid, label=f"{{ {n.label}{' | ' if len(n.label)>0 else ''} data dim: {n.shape} | grad dim: {n.grad_shape} }}", shape='record')
         else:
             dot.node(name=uid, label=f"{{ {n.label}{' | ' if len(n.label)>0 else ''} data: {n.data:.4f} | grad: {n.grad:.4f} }}", shape='record')
         if n._op:

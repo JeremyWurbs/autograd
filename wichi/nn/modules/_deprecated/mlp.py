@@ -1,4 +1,4 @@
-from wichi.nn import Module, Layer
+from wichi.nn.modules._deprecated import Module, Layer
 
 
 class MLP(Module):

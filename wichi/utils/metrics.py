@@ -13,7 +13,9 @@ class Metrics(object):
     def reset(self):
         self.confusion_mat = torch.zeros((self.num_classes, self.num_classes))
 
-    def log_prediction(self, pred: torch.Tensor, labels: torch.Tensor):
+    def log_prediction(self, pred, labels):
+        pred = pred if isinstance(pred, torch.Tensor) else torch.Tensor(pred)
+        labels = labels if isinstance(labels, torch.Tensor) else torch.Tensor(labels)
         p = torch.argmax(pred, dim=1).int()
         l = torch.argmax(labels, dim=1).int()
 

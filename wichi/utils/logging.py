@@ -21,10 +21,13 @@ class Logger(object):
             self.axes[title] = ax
         for idx, name in enumerate(names):
             steps = [t['step'] for t in self.get_log(name)]
-            losses = [t['value'] for t in self.get_log(name)]
+            losses = [float(t['value']) for t in self.get_log(name)]
             self.axes[title].plot(steps, losses, color=colors[idx % len(colors)])
         self.axes[title].set_title(title)
         self.axes[title].set_xlabel('step')
         self.axes[title].legend(names)
         plt.draw()
         plt.pause(0.5)
+
+    def pause_plots(self, interval):
+        plt.pause(interval)

@@ -1,4 +1,4 @@
-from wichi.nn import Module, Neuron
+from wichi.nn.modules._deprecated import Module, Neuron
 
 
 class Layer(Module):
