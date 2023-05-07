@@ -92,7 +92,9 @@ And used six different ops:
 In order to train the network to better classify `X`, we need to compute $\frac{\partial L}{\partial W}$, 
 which we can get through the chain rule:
 
+```math
 \frac{\partial L}{\partial W}  = \frac{\partial L}{\partial losses**2} \cdot \frac{\partial losses**2}{\partial losses} \cdot \frac{\partial losses}{\partial Z} \cdot \frac{\partial Z}{\partial Y} \cdot \frac{\partial Y}{\partial W}
+```
 
 The strategy for computing this gradient is as follows:
 1. Set `L.grad` to `1`
