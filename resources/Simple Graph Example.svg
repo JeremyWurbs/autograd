@@ -201,7 +201,7 @@
 <g id="node13" class="node">
 <title>140361829940144</title>
 <polygon fill="none" stroke="#000000" points="496.9942,-176.5 496.9942,-245.5 606.9942,-245.5 606.9942,-176.5 496.9942,-176.5"/>
-<text text-anchor="middle" x="551.9942" y="-230.3" font-family="Times,serif" font-size="14.00" fill="#000000">relu</text>
+<text text-anchor="middle" x="551.9942" y="-230.3" font-family="Times,serif" font-size="14.00" fill="#000000">Z</text>
 <polyline fill="none" stroke="#000000" points="496.9942,-222.5 606.9942,-222.5 "/>
 <text text-anchor="middle" x="551.9942" y="-207.3" font-family="Times,serif" font-size="14.00" fill="#000000">data dim: (32, 1)</text>
 <polyline fill="none" stroke="#000000" points="496.9942,-199.5 606.9942,-199.5 "/>
