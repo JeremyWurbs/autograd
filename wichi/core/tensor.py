@@ -89,7 +89,7 @@ class Tensor(object):
         return out
 
     def transpose(self):
-        out = Tensor(self.data.transpose(), _children=(self, ), _op='.T')
+        out = Tensor(self.data.transpose(), _children=(self, ), _op='.T', label=f'{self.label}.T')
 
         def _grad_fn():
             self.grad += out.grad.transpose()
@@ -101,9 +101,17 @@ class Tensor(object):
     def T(self):
         return self.transpose()
 
+    def reshape(self, shape):
+        out = Tensor(self.data.reshape(shape), label=f'{self.label}.reshape()')
+
+        def _grad_fn():
+            self.grad = out.grad.reshape(self.grad.shape)
+        out._grad_fn = _grad_fn
+
+        return out
+
     def exp(self):
-        x = self.data
-        out = Tensor(np.exp(self.data), _children=(self, ), _op='exp')
+        out = Tensor(np.exp(self.data), _children=(self, ), _op='exp', label=f'{self.label}.exp()')
 
         def _grad_fn():
             self.grad += out.data * out.grad
@@ -112,7 +120,7 @@ class Tensor(object):
     def tanh(self):
         x = self.data
         t = (np.exp(2*x) - 1) / (np.exp(2*x) + 1)
-        out = Tensor(t, _children=(self, ), _op='tanh')
+        out = Tensor(t, _children=(self, ), _op='tanh', label=f'{self.label}.tanh()')
 
         def _grad_fn():
             self.grad += (1 - t**2) * out.grad
@@ -121,7 +129,7 @@ class Tensor(object):
         return out
 
     def relu(self):
-        out = Tensor(np.where(self.data > 0., self.data, 0.), _children=(self, ), _op='ReLU')
+        out = Tensor(np.where(self.data > 0., self.data, 0.), _children=(self, ), _op='ReLU', label=f'{self.label}.relu()')
 
         def _grad_fn():
             self.grad += np.where(out.data > 0., 1., 0.) * out.grad

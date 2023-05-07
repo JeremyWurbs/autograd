@@ -6,7 +6,7 @@ from wichi.nn import Module, Layer
 
 class MLP(Module):
     def __init__(self, dim, name='MLP'):
-        self.layers = [Layer(dim[i], dim[i+1], name=f'Layer_{i}') for i in range(len(dim)-1)]
+        self.layers = [Layer(dim[i], dim[i+1], name=f'Layer{i}') for i in range(len(dim)-1)]
 
     def __call__(self, x):
         # x has dim (B, num_input)

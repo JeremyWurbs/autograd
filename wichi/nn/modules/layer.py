@@ -7,16 +7,21 @@ from wichi.nn import Module
 class Layer(Module):
     def __init__(self, num_input, num_output, name='Layer', bias=True):
         self.name = name
-        self.weight = Tensor(np.random.rand(num_output, num_input), label=f'{name}_weight')
-        self.bias = Tensor(np.random.rand(1, num_output), label=f'{name}_bias') if bias else None
+        self.weight = Tensor(np.random.rand(num_output, num_input), label=f'{name}.weight')
+        self.bias = Tensor(np.random.rand(1, num_output), label=f'{name}.bias') if bias else None
 
     def __call__(self, x):
         # x has dim (B, num_input)
         act = x @ self.weight.T  # (B, num_output)
+        act.label = f'{self.name}_dot_product'
         if self.bias is not None:
-            B, num_input = x.shape
-            act += Tensor(np.ones((B, 1), dtype=self.bias.dtype)) @ self.bias  # Broadcast the bias array with a Tensor so it will backprop
+            if len(x.shape) == 1:
+                B = 1
+            else:
+                B, num_input = x.shape
+            act += Tensor(np.ones((B, 1), dtype=self.bias.dtype), label='Ones') @ self.bias  # Broadcast the bias array with a Tensor so it will backprop
         out = act.tanh()
+        out.label = f'{self.name}_output'
         return out
 
     def parameters(self):
