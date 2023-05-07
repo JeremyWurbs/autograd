@@ -23,8 +23,14 @@ class Tensor(object):
         out = Tensor(self.data + other.data, _children=(self, other), _op='+')
 
         def _grad_fn():
-            self.grad += 1.0 * out.grad
-            other.grad += 1.0 * out.grad
+            if self.is_scalar:
+                self.grad += 1.0 * np.sum(out.grad)
+            else:
+                self.grad += 1.0 * out.grad
+            if other.is_scalar:
+                other.grad += 1.0 * np.sum(out.grad)
+            else:
+                other.grad += 1.0 * out.grad
         out._grad_fn = _grad_fn
 
         return out
