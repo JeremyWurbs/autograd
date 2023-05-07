@@ -322,7 +322,14 @@ For an explicit training sample, refer to the
 [mnist_training.py](./scripts/mnist_training_deprecated.py)
 sample, which initializes a Wichi network with the same weights as a Torch model,
 and then trains both side by side, asserting that the Wichi autograd exactly
-matches PyTorch's autograd.
+matches PyTorch's autograd. Or if you wish to begin looking at the optimizer, 
+refer to [optimizer_comparison.py](./scripts/optimizer_comparison.py), which 
+initializes the same model each with their own optimizer. As expected, 
+hyperparameters greatly affect training efficiency and convergence. Below we show
+the result of an `optimizer_comparison.py` run using four different optimizers, 
+each with different momentum hyperparamters.
+
+![optimizer comparison](./resources/optimizer_comparison_val_accuracy.png)
 
 # Testing
 

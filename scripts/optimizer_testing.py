@@ -37,8 +37,8 @@ for layer_idx, layer in enumerate(mlp_wichi.layers):
     layer.bias = wichi.Tensor(mlp_torch.get_submodule(f'{2*layer_idx}').bias.detach())
     layer.bias.data = layer.bias.data.reshape((1, layer.bias.numel()))
 
-optimizer_wichi = wichi.optim.SGD(mlp_wichi.parameters(), lr=param['lr'])
-optimizer_torch = torch.optim.SGD(mlp_torch.parameters(), lr=param['lr'])
+optimizer_wichi = wichi.optim.SGD(mlp_wichi.parameters(), lr=param['lr'], momentum=0.9, dampening=0.1)
+optimizer_torch = torch.optim.SGD(mlp_torch.parameters(), lr=param['lr'], momentum=0.9, dampening=0.1)
 
 # Training loop
 batches_per_epoch = param['num_train'] // param['batch_size']
