@@ -128,7 +128,7 @@ def __matmul__(X, W):
 ```
 
 Note that this grad function actually has to compute 
-$\frac{\partial dot_product}{\partial W}$ **and** $\frac{\partial dot_product}{\partial X}$, since
+$\frac{\partial dot\\_product}{\partial W}$ **and** $\frac{\partial dot\\_product}{\partial X}$, since
 `__matmul__` is a binary operator and thus, in general, the gradients need to 
 flow to both input Tensors (even though in this case we do not need the `X.grad`).
 
