@@ -37,6 +37,9 @@ for layer_idx, layer in enumerate(mlp_wichi.layers):
     layer.bias = wichi.Tensor(mlp_torch.get_submodule(f'{2*layer_idx}').bias.detach())
     layer.bias.data = layer.bias.data.reshape((1, layer.bias.numel()))
 
+optimizer_wichi = wichi.optim.SGD(mlp_wichi.parameters(), lr=param['lr'])
+optimizer_torch = torch.optim.SGD(mlp_torch.parameters(), lr=param['lr'])
+
 # Training loop
 batches_per_epoch = param['num_train'] // param['batch_size']
 for epoch in range(param['max_epoch']):
@@ -55,22 +58,17 @@ for epoch in range(param['max_epoch']):
         loss_torch = torch.sum((y - preds_torch) ** 2) / preds_torch.numel()
 
         # Compute gradients
-        mlp_wichi.zero_grad()
+        optimizer_wichi.zero_grad()
         loss_wichi.backward()
 
-        mlp_torch.zero_grad()
+        optimizer_torch.zero_grad()
         loss_torch.backward()
 
         logger.log_scalar('train loss', value=loss_wichi.data, step=epoch * batches_per_epoch + b)
 
         # Update parameters
-        for p in mlp_wichi.parameters():
-            p.data -= param['lr'] * p.grad
-
-        with torch.no_grad():
-            for p in mlp_torch.parameters():
-                p_new = p - param['lr'] * p.grad
-                p.copy_(p_new)
+        optimizer_wichi.step()
+        optimizer_torch.step()
 
         # Assert the two models are training identically
         assert torch.allclose(torch.tensor(preds_wichi.data), preds_torch, rtol=1e-3, atol=1e-5)

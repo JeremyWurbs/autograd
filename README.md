@@ -117,7 +117,7 @@ For example, the `grad_fn` for the `dot_product` Tensor is generated as part
 of the `@` op (i.e. `X.__matmul__(W)`), and would be functionally identical to the following:
 ```python 
 def __matmul__(X, W):
-    dot_product = Tensor(X.data * W.data)
+    dot_product = Tensor(X.data @ W.data)
 
     def _grad_fn():
         X.grad += dot_product.grad @ W.data.T
@@ -131,6 +131,21 @@ Note that this grad function actually has to compute
 $\frac{\partial dot\\_product}{\partial W}$ **and** $\frac{\partial dot\\_product}{\partial X}$, since
 `__matmul__` is a binary operator and thus, in general, the gradients need to 
 flow to both input Tensors (even though in this case we do not need the `X.grad`).
+
+For the backwards pass, each `._grad_fn()` must be called in the proper order. 
+In order to create the backwards call order properly, each Tensor created by 
+a Tensor op passes the parent Tensor to this newly created Tensor. That is, 
+the above pseudo-code for `X.__matmul__(W)` would start closer to:
+
+```python 
+def __matmul__(X, W):
+    dot_product = Tensor(X.data @ W.data, _children=(X, W))
+    ...
+```
+
+Notice the `_children=(X, W)` argument where we pass in the two input Tensors. 
+In the future, when a tensor's `backward()` method is called, we will use
+the knowledge of which 
 
 # Usage Basics
 
@@ -226,6 +241,35 @@ for epoch in max_epochs:
         for p in mlp.parameters():
             p -= lr * p.grad
         
+        print(f'loss: {loss}')
+```
+
+Note that you can also use an explicit optimizer, directly analogous to Torch, 
+if you prefer:
+
+```python 
+from wichi import MLP, DataModule  # E.g. MNIST
+
+param = {'num_input': 784, 
+         'hidden_dims': [200, 80, 40],
+         'num_output': 10,
+         'max_epochs': 3,
+         'loss_fn': MeanSquaredError(),
+         'lr': 0.01}
+
+mlp = MLP(dim=[num_input, *hidden_dims, num_output])
+optimizer = wichi.optim.SGD(mlp.parameters(), lr=lr)
+data = DataModule() 
+
+for epoch in max_epochs:
+    for x, y in data.next_training_batch():
+        y_hat = mlp(x)
+        loss = loss_fn(y, y_hat)
+        
+        optimizer.zero_grad()
+        loss.backward()
+        optimizer.step()
+                
         print(f'loss: {loss}')
 ```
 
