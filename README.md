@@ -57,13 +57,13 @@ according to a squared error loss (i.e. imagine `X` and `labels` have actual dat
 import numpy as np
 from wichi import Tensor
 
-X = Tensor(np.random.randn(32, 784))
-W = Tensor(np.random.randn(784, 1))
-labels = Tensor(np.random.randn(32, 1))
+X = Tensor(np.random.randn(32, 784))  # input data
+Y = Tensor(np.random.randn(32, 1))    # train labels
+W = Tensor(np.random.randn(784, 1))   # weights to train
 
-Y = X @ W  # i.e. Y = X.__matmul__(W)
-Z = Y.relu()
-L = ((Z - labels)**2).sum()
+dot_product = X @ W     # i.e. dot_product = X.__matmul__(W)
+Z = dot_product.relu()  # perceptron output
+L = ((Z - Y)**2).sum()  # loss = sum squared loss
 ```
 which yields the following graph:
 
