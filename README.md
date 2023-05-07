@@ -167,12 +167,12 @@ draw_dot(loss).render()
 
 ![Rendered DiGraph](./resources/Backward%20Pass%20Example.svg)
 
-Now the gradients have been filled in, and any parameter updates may happen as
+Now that the gradients have been filled in any parameter updates may happen as
 discussed above.
 
-## wichi.modules
+## The nn Module
 
-In addition, there is also the Modules module, which provides Neuron, Layer and
+In addition, there is also the nn (neural networks) module, which provides Neuron, Layer and
 MLP classes to help create simple neural networks.
 
 ```python
@@ -206,14 +206,13 @@ In order to train a network using Wichi, simply update any parameters according 
 from wichi import MLP, DataModule  # E.g. MNIST
 
 param = {'num_input': 784, 
-         'hidden_dim_1': 20,
-         'hidden_dim_2': 20,
+         'hidden_dims': [200, 80, 40],
          'num_output': 10,
          'max_epochs': 3,
          'loss_fn': MeanSquaredError(),
          'lr': 0.01}
 
-mlp = MLP(dim=[num_input, hidden_dim_1, hidden_dim_2, num_output])
+mlp = MLP(dim=[num_input, *hidden_dims, num_output])
 data = DataModule() 
 
 for epoch in max_epochs:
