@@ -146,8 +146,8 @@ flow to both input Tensors (even though in this case we do not need the `X.grad`
 
 For the backwards pass, each `._grad_fn()` must be called in the proper order. 
 In order to create the backwards call order properly, each Tensor created by 
-a Tensor op passes the parent Tensor to this newly created Tensor. That is, 
-the above pseudo-code for `X.__matmul__(W)` would start closer to:
+a Tensor op passes themselves as a child Tensor to this newly created Tensor. 
+That is, the above pseudo-code for `X.__matmul__(W)` would start closer to:
 
 ```python 
 def __matmul__(X, W):
@@ -156,17 +156,17 @@ def __matmul__(X, W):
 ```
 
 Notice the `_children=(X, W)` argument where we pass in the two input Tensors, 
-and that when the current Tensor's `_grad_fn()` is called, the children's 
-`_grad_fn()` may be called next. Thus, in the future, when a tensor's 
-`backward()` method is called we may dynamically construct the reverse graph
-by recursively calling all the children of Tensor's and setting their `_grad_fn()`
-methods to run directly after the current Tensor's method. 
+and that *after* we compute the new (i.e. `dot_product's`) `_grad_fn()`, we are free
+to call the `_grad_fn()` on the children (i.e. `W` and `X`). This fact is used to
+dynamically construct a reverse computation graph by recursively adding the 
+children tensors onto a sequential "tape". 
 
-More, the backward traversal path is not computed until a Tensor's `backward()` 
-method is called, allowing the forward graph to change dynamically from input 
-to input (or batch to batch), and for any number of losses or backwards gradients
-to be computed and composited onto each other trivially at run-time, anywhere in 
-the entire computation graph— a rather powerful computational tool.
+More, as the backward traversal path is not computed until a Tensor's `backward()` 
+method is called, the forward graph is allowed to change dynamically from input 
+to input (or batch to batch), and will also work for any number of losses or 
+backwards gradients you may wish to compute and composite onto each other,
+all done at run-time, anywhere in the entire computation graph— a rather 
+powerful computational tool.
 
 Explicitly, the backwards graph is computed at the start of the `backwards()` 
 method:
@@ -184,7 +184,7 @@ def backward(self):
     build_topo(self)
 ```
 
-Which builds a sequential traversal through the graph in `topo`, which is subsequently
+Which builds a sequential traversal path through the graph in `topo`, which is subsequently
 traversed with:
 
 ```python 
