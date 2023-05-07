@@ -59,7 +59,29 @@ def test_basic_ops():
 
 
 def test_advanced_ops():
+    x_1_wichi = Tensor([[2., 1.5], [-1.5, 3.]])
+    x_1_torch = torch.Tensor(x_1_wichi.data); x_1_torch.requires_grad = True
 
+    x_2_wichi = x_1_wichi.relu()
+    x_2_torch = torch.relu(x_1_torch)
+    assert torch.allclose(torch.tensor(x_2_wichi.data), x_2_torch)
 
+    x_3_wichi = x_1_wichi.tanh()
+    x_3_torch = x_1_torch.tanh()
+    assert torch.allclose(torch.tensor(x_3_wichi.data), x_3_torch)
 
-test_advanced_ops()
+    x_4_wichi = x_3_wichi.exp()
+    x_4_torch = x_3_torch.exp()
+    assert torch.allclose(torch.tensor(x_4_wichi.data), x_4_torch)
+
+    x_5_wichi = x_4_wichi.reshape((4, 1))
+    x_5_torch = x_4_torch.reshape((4, 1))
+    assert torch.allclose(torch.tensor(x_5_wichi.data), x_5_torch)
+
+    x_6_wichi = x_5_wichi.sum()
+    x_6_torch = x_5_torch.sum()
+    assert torch.allclose(torch.tensor(x_6_wichi.data), x_6_torch)
+
+    x_6_wichi.backward()
+    x_6_torch.backward()
+    assert torch.allclose(torch.tensor(x_1_wichi.grad), x_1_torch.grad)
