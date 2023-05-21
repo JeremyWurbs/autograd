@@ -62,7 +62,7 @@ the magic of backpropagation and autograd, your network will improve.
 
 Consider the following network, intuitively training a weight matrix, `W`, to 
 better classify a batch of 32 MNIST images (each 28*28=784 pixels) according to 
-a squared error loss (i.e. imagine `X` and `labels` have actual data):
+a squared error loss (i.e. imagine `X` and `Y` have actual data):
 
 ```python 
 import numpy as np
