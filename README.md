@@ -29,8 +29,7 @@ pip install -r requirements.txt
 OR
 
 ```commandline
-python setup.py bdist_wheel
-pip install dist/wichi-1.0.0-py3-none-any.whl
+python setup.py install
 ```
 
 # Understanding Autograd
