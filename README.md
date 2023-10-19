@@ -319,7 +319,7 @@ for epoch in max_epochs:
 ```
 
 For an explicit training sample, refer to the 
-[mnist_training.py](./scripts/mnist_training_deprecated.py)
+[mnist_training.py](./scripts/mnist_training.py)
 sample, which initializes a Wichi network with the same weights as a Torch model,
 and then trains both side by side, asserting that the Wichi autograd exactly
 matches PyTorch's autograd. Or if you wish to begin looking at the optimizer, 
